@@ -1,4 +1,6 @@
 ﻿using System;
+using Newtonsoft.Json;
+
 namespace ems_csharp
 {
     internal class Employee
@@ -13,18 +15,21 @@ namespace ems_csharp
 
         public DateTime birthDay;
 
+        public EmployeeType type;
+
         const int minimalHoursWorked = 1;
 
-        public Employee(string firstName, string lastName, string email, DateTime birthDay) : this(firstName, lastName, email, birthDay, 0)
+        public Employee(string firstName, string lastName, string email, DateTime birthDay) : this(firstName, lastName, email, birthDay, 0, EmployeeType.StoreManager)
         {}
 
-        public Employee(string firstName, string lastName, string email, DateTime birthDay, double hourlyRate)
+        public Employee(string firstName, string lastName, string email, DateTime birthDay, double hourlyRate, EmployeeType type)
         {
             this.firstName = firstName;
             this.lastName = lastName;
             this.email = email;
             this.birthDay = birthDay;
             this.hourlyRate = hourlyRate;
+            this.type = type;
         }
 
         public void PerformWork() => PerformWork(minimalHoursWorked);
@@ -43,10 +48,25 @@ namespace ems_csharp
             return bonus;
         }
 
-        public int CalculateBonusAndBonusTax(int bonus, ref int bonusTax)
+        //public int CalculateBonusAndBonusTax(int bonus, ref int bonusTax)
+        //{
+        //    if (hoursWorked > 10) bonus *= 2;
+        //    if (bonus >= 200)
+        //    {
+        //        bonusTax = bonus / 10;
+        //        bonus -= bonusTax;
+        //    }
+
+        //    Console.WriteLine($"The employee got a bonus of {bonus} and the tax on the bonus is {bonusTax}");
+
+        //    return bonus;
+        //}
+
+        public int CalculateBonusAndBonusTax(int bonus, out int bonusTax)
         {
+            bonusTax = 0;
             if (hoursWorked > 10) bonus *= 2;
-            if(bonus >= 200)
+            if (bonus >= 200)
             {
                 bonusTax = bonus / 10;
                 bonus -= bonusTax;
@@ -59,10 +79,25 @@ namespace ems_csharp
 
         public double ReceiveWage(bool resetHours = true)
         {
-            wage = hoursWorked * hourlyRate;
+            if(type == EmployeeType.Manager)
+            {
+                Console.WriteLine($"An extra was added to the wage since {firstName} is a manager.");
+                wage = hoursWorked * hourlyRate * 1.25;
+            }
+            else
+            {
+                wage = hoursWorked * hourlyRate;
+            }
+
             Console.WriteLine($"{firstName} {lastName} has received a wage of {wage} for {hoursWorked} hour(s) of work");
             if (resetHours) hoursWorked = 0;
             return wage;
+        }
+
+        public string ConvertToJson()
+        {
+            string json = JsonConvert.SerializeObject(this);
+            return json;
         }
 
         public void DisplayEmployeeDetails()
