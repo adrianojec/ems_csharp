@@ -42,6 +42,10 @@ namespace ems_csharp
             double emilyReceivedWage = emily.ReceiveWage(true);
             Console.WriteLine($"Wage paid (by the program): {emilyReceivedWage}");
 
+            WorkTask task;
+            task.description = "Bake delicious pies";
+            task.hours = 3;
+            task.PerformWorkTask();
         }
     }
 }
